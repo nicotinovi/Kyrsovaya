@@ -1,0 +1,26 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: pokerclub
+  datasource:
+    url: jdbc:postgresql://localhost:5432/pokerclub
+    username: postgres
+    password: postgres
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+  flyway:
+    enabled: true
+
+app:
+  jwt:
+    secret: "coursework-demo-secret-key-change-before-production-2026"
+    expiration-minutes: 720
+  frontend-origin: "http://localhost:5173"
+

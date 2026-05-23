@@ -1,0 +1,26 @@
+# Java / Maven
+backend/target/
+*.class
+
+# IntelliJ IDEA
+.idea/
+*.iml
+
+# Node / React
+frontend/node_modules/
+frontend/dist/
+
+# Environment
+.env
+*.env
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Generated reports
+tournament-*-report.csv
+tournament-*-report.pdf
