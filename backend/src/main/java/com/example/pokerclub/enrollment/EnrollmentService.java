@@ -117,7 +117,7 @@ public class EnrollmentService {
         );
         //чтобы не записаться еще раз
         if (hasActiveEnrollment) {
-            throw new BadRequestException("Вы уже записаны на это мероприятие");
+            throw new BadRequestException("Пользователь уже записан на мероприятие");
         }
 
         long activeCount = enrollmentRepository.countActiveByEventId(event.getId());

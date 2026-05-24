@@ -3,21 +3,28 @@ package com.example.pokerclub.report;
 //собирает данные и возвращает файл в виде массива байтов byte[]
 
 import com.example.pokerclub.common.BadRequestException;
+import com.example.pokerclub.enrollment.Enrollment;
+import com.example.pokerclub.enrollment.EnrollmentRepository;
+import com.example.pokerclub.enrollment.EnrollmentStatus;
 import com.example.pokerclub.event.Event;
 import com.example.pokerclub.event.EventService;
 import com.example.pokerclub.event.EventType;
 import com.example.pokerclub.rating.RatingEntry;
 import com.example.pokerclub.rating.RatingEntryRepository;
 import com.lowagie.text.Document;
+import com.lowagie.text.Font;
 import com.lowagie.text.Paragraph;
+import com.lowagie.text.pdf.BaseFont;
 import com.lowagie.text.pdf.PdfWriter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.lowagie.text.Font;
-import com.lowagie.text.pdf.BaseFont;
+import com.example.pokerclub.user.User;
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 
 
@@ -26,20 +33,25 @@ public class ReportService {
 
     private final EventService eventService; //нужен чтобы найти мероприятие по id
     private final RatingEntryRepository ratingEntryRepository; //нужен дляполучения отчета  турнире: кто сколько очков получил
+    private final EnrollmentRepository enrollmentRepository;
 
     public ReportService(EventService eventService,
-                         RatingEntryRepository ratingEntryRepository) {
+                         RatingEntryRepository ratingEntryRepository,
+                         EnrollmentRepository enrollmentRepository) {
         this.eventService = eventService;
         this.ratingEntryRepository = ratingEntryRepository;
+        this.enrollmentRepository = enrollmentRepository;
     }
 
     //формирует CSV отчет
     @Transactional(readOnly = true) //значит что мы только читаем данные и ничег оне изменяем
     //Long tournamentId - id турнира, по которому надо сформировать отчет.
     //byte[] - результат работы метода. Это готовый файл в виде байтов.
+    private record ReportRow(User visitor, int points) {
+    }
     public byte[] generateTournamentCsvReport(Long tournamentId) {
         Event tournament = findTournament(tournamentId); //берем мероприятие и сразу прверяем что это турнир
-        List<RatingEntry> entries = ratingEntryRepository.findByTournamentIdOrderByPointsDesc(tournamentId); //получаем все начисления очков по конкретному турниру
+        List<ReportRow> rows = buildReportRows(tournamentId); //получаем все начисления очков по конкретному турниру
         //метод возвращает список отсортированный по очка по убыанию
 
         StringBuilder csv = new StringBuilder(); //нужен чтобы постепенно собрать текст файла CSV
@@ -67,22 +79,20 @@ public class ReportService {
         csv.append("Place;Visitor ID;First Name;Last Name;Email;Points\n");
 
         //проходим по всем результатам турнира
-        for (int i = 0; i < entries.size(); i++) {
-            RatingEntry entry = entries.get(i);
+        for (int i = 0; i < rows.size(); i++) {
+            ReportRow row = rows.get(i);
 
             csv.append(i + 1)
-                    //entry.getVisitor() - игрок, которому начислены очки.
-                    //entry.getPoints() - очки игрока за этот конкретный турнир.
                     .append(";")
-                    .append(entry.getVisitor().getId())
+                    .append(row.visitor().getId())
                     .append(";")
-                    .append(escapeCsv(entry.getVisitor().getFirstName()))
+                    .append(escapeCsv(row.visitor().getFirstName()))
                     .append(";")
-                    .append(escapeCsv(entry.getVisitor().getLastName()))
+                    .append(escapeCsv(row.visitor().getLastName()))
                     .append(";")
-                    .append(escapeCsv(entry.getVisitor().getEmail()))
+                    .append(escapeCsv(row.visitor().getEmail()))
                     .append(";")
-                    .append(entry.getPoints())
+                    .append(row.points())
                     .append("\n");
         }
 
@@ -95,7 +105,7 @@ public class ReportService {
     @Transactional(readOnly = true)
     public byte[] generateTournamentPdfReport(Long tournamentId) {
         Event tournament = findTournament(tournamentId); //проверка что это турнир
-        List<RatingEntry> entries = ratingEntryRepository.findByTournamentIdOrderByPointsDesc(tournamentId); //получаени результата турнира
+        List<ReportRow> rows = buildReportRows(tournamentId); //получаени результата турнира
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream(); //поток в памяти
         //файл не создается на диске, он собирается в оперативке и потом передается через HTTP
@@ -116,23 +126,23 @@ public class ReportService {
         document.add(new Paragraph("Дата и время: " + tournament.getDateTime()));
         document.add(new Paragraph(" "));
 
-        if (entries.isEmpty()) { //если нет результатов турнира, то в пдф будет сообщение ниже
-            document.add(new Paragraph("По турниру пока нет начислений рейтинга."));
-        } else { //если есть результат то добавляем заголовок Result
-            document.add(new Paragraph("Результаты:"));
+        if (rows.isEmpty()) {
+            document.add(new Paragraph("По турниру пока нет подтвержденных участников.", textFont));
+        } else {
+            document.add(new Paragraph("Результаты:", titleFont));
 
-            //проход по каждому результату турнира
-            for (int i = 0; i < entries.size(); i++) {
-                RatingEntry entry = entries.get(i);
+            for (int i = 0; i < rows.size(); i++) {
+                ReportRow row = rows.get(i);
 
                 String line = (i + 1) + ". "
-                        + entry.getVisitor().getFirstName() + " "
-                        + entry.getVisitor().getLastName()
-                        + " (" + entry.getVisitor().getEmail() + ")"
-                        + " - " + entry.getPoints() + " очков";
+                        + row.visitor().getFirstName() + " "
+                        + row.visitor().getLastName()
+                        + " (" + row.visitor().getEmail() + ")"
+                        + " - " + row.points() + " очков";
 
-                document.add(new Paragraph(line)); //добавление строки в пдф
+                document.add(new Paragraph(line, textFont));
             }
+
         }
 
         document.close();
@@ -180,5 +190,28 @@ public class ReportService {
         } catch (Exception e) {
             throw new IllegalStateException("Не удалось загрузить шрифт для PDF", e);
         }
+    }
+
+    private List<ReportRow> buildReportRows(Long tournamentId) {
+        List<Enrollment> enrollments = enrollmentRepository.findByEventIdOrderByCreatedAtAsc(tournamentId)
+                .stream()
+                .filter(enrollment -> enrollment.getStatus() == EnrollmentStatus.PRESENT)
+                .toList();
+
+        Map<Long, RatingEntry> entriesByVisitorId = ratingEntryRepository.findByTournamentIdOrderByPointsDesc(tournamentId)
+                .stream()
+                .collect(Collectors.toMap(
+                        entry -> entry.getVisitor().getId(),
+                        Function.identity()
+                ));
+
+        return enrollments.stream()
+                .map(enrollment -> {
+                    RatingEntry entry = entriesByVisitorId.get(enrollment.getVisitor().getId());
+                    int points = entry == null ? 0 : entry.getPoints();
+                    return new ReportRow(enrollment.getVisitor(), points);
+                })
+                .sorted((a, b) -> Integer.compare(b.points(), a.points()))
+                .toList();
     }
 }
