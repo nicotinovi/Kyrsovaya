@@ -5,20 +5,6 @@ type RouteGuardProps = {
   children: React.ReactNode;
 };
 
-export function RequireAuth({ children }: RouteGuardProps) {
-  const { isLoading, isAuthenticated } = useAuth();
-
-  if (isLoading) {
-    return <div className="state-message">Проверка авторизации...</div>;
-  }
-
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
-
-  return children;
-}
-
 export function RequireAdmin({ children }: RouteGuardProps) {
   const { isLoading, isAuthenticated, isAdmin } = useAuth();
 

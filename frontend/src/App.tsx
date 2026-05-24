@@ -10,14 +10,6 @@ import { RatingsPage } from './pages/RatingsPage';
 import { AdminPanelPage } from './pages/AdminPanelPage';
 import { RequireAdmin, RequireVisitor } from './components/RouteGuards';
 
-function PlaceholderPage({ title }: { title: string }) {
-  return (
-    <section className="content-section">
-      <div className="state-message">{title} будет добавлен следующим шагом.</div>
-    </section>
-  );
-}
-
 const router = createBrowserRouter([
   {
     path: '/',

@@ -1,5 +1,5 @@
 //страница рейтинга
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import * as ratingsApi from '../api/ratingsApi';
 import { useAuth } from '../context/AuthContext';
 import type { RatingResponse } from '../types/rating';
@@ -21,7 +21,7 @@ export function RatingsPage() {
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
 
-  async function loadRatings() {
+  const loadRatings = useCallback(async function loadRatings() {
     setIsLoading(true);
     setError('');
 
@@ -40,11 +40,11 @@ export function RatingsPage() {
     } finally {
       setIsLoading(false);
     }
-  }
+  }, [token, isAuthenticated, isAdmin]);
 
   useEffect(() => {
     loadRatings();
-  }, [token, isAuthenticated, isAdmin]);
+  }, [loadRatings]);
 
   async function handleRecalculate() {
     if (!token) {

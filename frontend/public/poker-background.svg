@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1100" viewBox="0 0 1600 1100" role="img" aria-label="Poker background">
+  <defs>
+    <radialGradient id="feltGlow" cx="50%" cy="35%" r="70%">
+      <stop offset="0%" stop-color="#1f6f55"/>
+      <stop offset="55%" stop-color="#0f3f35"/>
+      <stop offset="100%" stop-color="#071f1d"/>
+    </radialGradient>
+    <pattern id="feltTexture" width="64" height="64" patternUnits="userSpaceOnUse">
+      <path d="M0 18 C18 2 34 38 64 14" fill="none" stroke="#ffffff" stroke-width="1" opacity="0.05"/>
+      <path d="M0 46 C22 28 42 70 64 42" fill="none" stroke="#ffffff" stroke-width="1" opacity="0.04"/>
+      <circle cx="12" cy="12" r="1.4" fill="#ffffff" opacity="0.08"/>
+      <circle cx="50" cy="38" r="1.2" fill="#ffffff" opacity="0.07"/>
+    </pattern>
+    <filter id="softShadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#000000" flood-opacity="0.28"/>
+    </filter>
+  </defs>
+
+  <rect width="1600" height="1100" fill="url(#feltGlow)"/>
+  <rect width="1600" height="1100" fill="url(#feltTexture)" opacity="0.95"/>
+
+  <g opacity="0.32" filter="url(#softShadow)">
+    <g transform="translate(150 120) rotate(-14)">
+      <rect width="180" height="250" rx="18" fill="#f8fafc"/>
+      <rect x="14" y="14" width="152" height="222" rx="12" fill="none" stroke="#d9e2ec" stroke-width="4"/>
+      <text x="34" y="58" font-family="Arial, sans-serif" font-size="42" font-weight="800" fill="#b91c1c">A</text>
+      <path d="M90 82 C54 46 8 94 38 134 C62 166 90 186 90 186 C90 186 118 166 142 134 C172 94 126 46 90 82Z" fill="#dc2626"/>
+      <text x="128" y="216" font-family="Arial, sans-serif" font-size="42" font-weight="800" fill="#b91c1c" transform="rotate(180 128 216)">A</text>
+    </g>
+
+    <g transform="translate(1190 165) rotate(12)">
+      <rect width="180" height="250" rx="18" fill="#f8fafc"/>
+      <rect x="14" y="14" width="152" height="222" rx="12" fill="none" stroke="#d9e2ec" stroke-width="4"/>
+      <text x="34" y="58" font-family="Arial, sans-serif" font-size="42" font-weight="800" fill="#111827">K</text>
+      <path d="M90 58 C122 102 122 148 90 192 C58 148 58 102 90 58Z" fill="#111827"/>
+      <path d="M90 58 C46 92 46 158 90 192" fill="#111827"/>
+      <path d="M90 58 C134 92 134 158 90 192" fill="#111827"/>
+      <rect x="78" y="184" width="24" height="26" rx="4" fill="#111827"/>
+      <text x="128" y="216" font-family="Arial, sans-serif" font-size="42" font-weight="800" fill="#111827" transform="rotate(180 128 216)">K</text>
+    </g>
+  </g>
+
+  <g opacity="0.34" filter="url(#softShadow)">
+    <g transform="translate(305 760)">
+      <circle cx="0" cy="0" r="74" fill="#dc2626"/>
+      <circle cx="0" cy="0" r="54" fill="none" stroke="#f8fafc" stroke-width="12" stroke-dasharray="26 20"/>
+      <circle cx="0" cy="0" r="28" fill="#b91c1c"/>
+      <circle cx="0" cy="0" r="18" fill="#f8fafc" opacity="0.88"/>
+    </g>
+
+    <g transform="translate(1310 730)">
+      <circle cx="0" cy="0" r="82" fill="#2563eb"/>
+      <circle cx="0" cy="0" r="60" fill="none" stroke="#f8fafc" stroke-width="13" stroke-dasharray="30 22"/>
+      <circle cx="0" cy="0" r="32" fill="#1d4ed8"/>
+      <circle cx="0" cy="0" r="20" fill="#f8fafc" opacity="0.88"/>
+    </g>
+
+    <g transform="translate(805 900)">
+      <circle cx="0" cy="0" r="66" fill="#f59e0b"/>
+      <circle cx="0" cy="0" r="48" fill="none" stroke="#f8fafc" stroke-width="10" stroke-dasharray="22 18"/>
+      <circle cx="0" cy="0" r="24" fill="#b45309"/>
+      <circle cx="0" cy="0" r="15" fill="#f8fafc" opacity="0.88"/>
+    </g>
+  </g>
+
+  <g opacity="0.14">
+    <circle cx="760" cy="395" r="255" fill="none" stroke="#ffffff" stroke-width="3"/>
+    <circle cx="760" cy="395" r="170" fill="none" stroke="#ffffff" stroke-width="2"/>
+    <path d="M535 395 H985" stroke="#ffffff" stroke-width="2"/>
+    <path d="M760 170 V620" stroke="#ffffff" stroke-width="2"/>
+  </g>
+</svg>

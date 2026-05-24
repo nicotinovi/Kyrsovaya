@@ -1,5 +1,5 @@
 //админ-страница
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { ApiRequestError } from '../api/httpClient';
 import * as enrollmentsApi from '../api/enrollmentsApi';
 import type { EnrollmentResponse } from '../types/enrollment';
@@ -61,7 +61,7 @@ export function AdminPanelPage() {
   const [isDownloadingReport, setIsDownloadingReport] = useState(false);
   const [editingEvent, setEditingEvent] = useState<EventResponse | null>(null); //состояние редактирования
 
-  async function loadEvents() {
+  const loadEvents = useCallback(async function loadEvents() {
     setIsLoading(true);
     setError('');
 
@@ -76,9 +76,9 @@ export function AdminPanelPage() {
     } finally {
       setIsLoading(false);
     }
-  }
+  }, []);
   //функция загрузки пользователей
-  async function loadVisitors() {
+  const loadVisitors = useCallback(async function loadVisitors() {
     if (!token) {
       return;
     }
@@ -89,14 +89,14 @@ export function AdminPanelPage() {
     } catch {
       setVisitors([]);
     }
-  }
+  }, [token]);
 
   useEffect(() => {
     if (isAdmin) {
       loadEvents();
       loadVisitors();
     }
-  }, [isAdmin, token]);
+  }, [isAdmin, loadEvents, loadVisitors]);
 
   async function handleCreateEvent(request: EventRequest) {
     if (!token) {
@@ -502,7 +502,13 @@ async function handleDownloadReport(format: 'csv' | 'pdf') {
           </div>
         )}
         {selectedEvent && (
-          <div className="participants-panel">
+                  <div className="participants-panel">
+          <div className="section-header compact participants-header">
+            <div>
+              <h2>Участники</h2>
+              <p>{selectedEvent.title}</p>
+            </div>
+
             {selectedEvent.eventType === 'TOURNAMENT' && eventEnrollments.length > 0 && (
               <div className="rating-actions">
                 <button
@@ -533,12 +539,7 @@ async function handleDownloadReport(format: 'csv' | 'pdf') {
                 </button>
               </div>
             )}
-            <div className="section-header compact">
-              <div>
-                <h2>Участники</h2>
-                <p>{selectedEvent.title}</p>
-              </div>
-            </div>
+        </div>
 
             <div className="manual-add-row">
               <div className="manual-add-field">
@@ -583,8 +584,14 @@ async function handleDownloadReport(format: 'csv' | 'pdf') {
             )}
 
             {!isLoadingEnrollments && eventEnrollments.length > 0 && (
-              <div className="table-wrap">
-                <table className="data-table">
+              <div className="table-wrap participants-table-wrap">
+                <table
+                  className={
+                    selectedEvent.eventType === 'TOURNAMENT'
+                      ? 'data-table participants-rating-table'
+                      : 'data-table'
+                  }
+                >
                   <thead>
                     <tr>
                       <th>ID</th>
@@ -604,28 +611,28 @@ async function handleDownloadReport(format: 'csv' | 'pdf') {
                         </td>
                         <td>{enrollment.visitor.email}</td>
                         <td>{enrollmentStatusLabels[enrollment.status]}</td>
+                        {selectedEvent.eventType === 'TOURNAMENT' && (
+                          <td>
+                            {enrollment.status === 'PRESENT' ? (
+                              <input
+                                className="points-input"
+                                value={pointsByEnrollmentId[enrollment.id] ?? ''}
+                                onChange={(event) =>
+                                  setPointsByEnrollmentId((current) => ({
+                                    ...current,
+                                    [enrollment.id]: event.target.value,
+                                  }))
+                                }
+                                type="number"
+                                min={0}
+                                placeholder="Не задано"
+                              />
+                            ) : (
+                              <span className="muted">Только после присутствия</span>
+                            )}
+                          </td>
+                        )}
                         <td className="table-actions">
-                          {selectedEvent.eventType === 'TOURNAMENT' && (
-                            <td>
-                              {enrollment.status === 'PRESENT' ? (
-                                <input
-                                  className="points-input"
-                                  value={pointsByEnrollmentId[enrollment.id] ?? ''}
-                                  onChange={(event) =>
-                                    setPointsByEnrollmentId((current) => ({
-                                      ...current,
-                                      [enrollment.id]: event.target.value,
-                                    }))
-                                  }
-                                  type="number"
-                                  min={0}
-                                  placeholder="Не задано"
-                                />
-                              ) : (
-                                <span className="muted">Только после присутствия</span>
-                              )}
-                            </td>
-                          )}
                           {enrollment.status === 'REGISTERED' && (
                             <button
                               className="button secondary"

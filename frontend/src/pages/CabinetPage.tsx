@@ -1,5 +1,5 @@
 //страница личного кабинета
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { ApiRequestError } from '../api/httpClient';
 import * as enrollmentsApi from '../api/enrollmentsApi';
 import { useAuth } from '../context/AuthContext';
@@ -36,7 +36,7 @@ export function CabinetPage() {
   const [successMessage, setSuccessMessage] = useState(''); //сообщение об успешном действии.
 
   //Функция загружает записи текущего пользователя.
-  async function loadEnrollments() {
+  const loadEnrollments = useCallback(async function loadEnrollments() {
     if (!token || isAdmin) {
       setIsLoading(false);
       return;
@@ -53,11 +53,11 @@ export function CabinetPage() {
     } finally {
       setIsLoading(false);
     }
-  }
+  }, [token, isAdmin]);
 
   useEffect(() => {
     loadEnrollments();
-  }, [token]); //когда страница открылась загружаем записи
+  }, [loadEnrollments]); //когда страница открылась загружаем записи
 
   //Функция вызывается, когда пользователь нажимает кнопку “Отменить”.
   async function handleCancel(enrollmentId: number) {
@@ -126,7 +126,7 @@ export function CabinetPage() {
       )}
 
       {!isLoading && enrollments.length > 0 && (
-        <div className="table-wrap">
+        <div className="table-wrap cabinet-table-wrap">
           <table className="data-table">
             <thead>
               <tr>

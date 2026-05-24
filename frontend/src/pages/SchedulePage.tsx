@@ -1,6 +1,5 @@
 //страница расписания
-import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useCallback, useEffect, useState } from 'react';
 import { ApiRequestError } from '../api/httpClient'; //ошибки бэка
 import * as enrollmentsApi from '../api/enrollmentsApi'; //запись на меропр
 import * as eventsApi from '../api/eventsApi'; //загрузка меропр
@@ -22,7 +21,7 @@ export function SchedulePage() {
   //загружает расписание с бэка
 
   
-  async function loadEvents() {
+  const loadEvents = useCallback(async function loadEvents() {
     setIsLoading(true);
     setError('');
 
@@ -45,9 +44,9 @@ export function SchedulePage() {
     } finally {
       setIsLoading(false);
     }
-  }
+  }, [type, isAdmin]);
 //выхывается при клике на кнопку записаться
-  async function loadMyEnrollments() {
+  const loadMyEnrollments = useCallback(async function loadMyEnrollments() {
     if (!token || isAdmin) {
       setEnrolledEventIds(new Set());
       return;
@@ -63,15 +62,15 @@ export function SchedulePage() {
     } catch {
       setEnrolledEventIds(new Set());
     }
-  }
+  }, [token, isAdmin]);
 
   useEffect(() => {
     loadEvents();
-  }, [type, isAdmin]);
+  }, [loadEvents]);
 
   useEffect(() => {
     loadMyEnrollments();
-  }, [token, isAdmin]);
+  }, [loadMyEnrollments]);
 
   async function handleEnroll(eventId: number) {
     if (!token) {
@@ -120,7 +119,7 @@ export function SchedulePage() {
             <div className="signin-callout">
                 <div>
                     <strong>Хотите записаться на мероприятие?</strong>
-                    <span>Войдите в систему или создайте аккаунт посетителя.</span>
+                    <span>Войдите в систему или зарегистрируйтесь.</span>
                 </div>
             </div>
         )}

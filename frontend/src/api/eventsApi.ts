@@ -47,11 +47,6 @@ export function getEvents(params: GetEventsParams = {}) {
   return apiRequest<PageResponse<EventResponse>>(`/events${toQueryString(params)}`);
 }
 
-//получить одно мероприятие
-export function getEventById(id: number) {
-  return apiRequest<EventResponse>(`/events/${id}`);
-}
-
 //создать турнир/тренировку
 export function createEvent(request: EventRequest, token: string) {
   return apiRequest<EventResponse>('/admin/events', {
