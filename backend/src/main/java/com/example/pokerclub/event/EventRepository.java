@@ -1,10 +1,8 @@
 package com.example.pokerclub.event;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -20,13 +18,6 @@ public interface EventRepository extends JpaRepository<Event, Long> { //репо
     Page<Event> findByStatus(EventStatus status, Pageable pageable);
     //получить все мероприятия
     Page<Event> findAll(Pageable pageable);
-
-    @Query("""
-        select e from Event e
-        where e.id = :id
-    """) //выбрать все объекты в event
-    Optional<Event> findEventById(@Param("id") Long id); //подставляет занчение id в запрос
-    //Optional<> потому что мероприятие может не существовать
 
     @Query("""
         select count(en.id)
@@ -50,4 +41,3 @@ public interface EventRepository extends JpaRepository<Event, Long> { //репо
         @Param("toTime") LocalDateTime toTime
     );
 }
-
