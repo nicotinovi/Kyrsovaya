@@ -1,14 +1,10 @@
 // страница входа
-
+import { Link } from 'react-router-dom';
 import { useState, type FormEvent } from 'react';
 import { ApiRequestError } from '../api/httpClient';
 import { useAuth } from '../context/AuthContext';
 
-type LoginPageProps = {
-  onSwitchToRegister: () => void;
-};
-
-export function LoginPage({ onSwitchToRegister }: LoginPageProps) {
+export function LoginPage() {
   const { login, isAuthenticated, user, logout } = useAuth(); //страница берет данные из AuthContext
 
   const [email, setEmail] = useState('admin@pokerclub.local'); //текст в поле email, setEmail - функция для изменения 
@@ -56,9 +52,9 @@ export function LoginPage({ onSwitchToRegister }: LoginPageProps) {
     <section className="panel">
       <div className="panel-title-row">
         <h2>Вход</h2>
-        <button className="link-button" type="button" onClick={onSwitchToRegister}>
+        <Link className="link-button" to="/register">
           Зарегистрироваться
-        </button>
+        </Link>
       </div>
 
       <form className="form" onSubmit={handleSubmit}>

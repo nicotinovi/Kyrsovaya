@@ -2,12 +2,10 @@
 import { useState, type FormEvent } from 'react';
 import { ApiRequestError } from '../api/httpClient';
 import { useAuth } from '../context/AuthContext';
+import { Link } from 'react-router-dom';
 
-type RegisterPageProps = {
-  onSwitchToLogin: () => void;
-};
 
-export function RegisterPage({ onSwitchToLogin }: RegisterPageProps) {
+export function RegisterPage() {
   const { register, isAuthenticated, user, logout } = useAuth();
 
   const [firstName, setFirstName] = useState('Иван');
@@ -93,9 +91,9 @@ export function RegisterPage({ onSwitchToLogin }: RegisterPageProps) {
     <section className="panel">
       <div className="panel-title-row">
         <h2>Регистрация</h2>
-        <button className="link-button" type="button" onClick={onSwitchToLogin}>
-          Уже есть аккаунт
-        </button>
+        <Link className="link-button" to="/login">
+            Уже есть аккаунт
+        </Link>
       </div>
 
       <form className="form" onSubmit={handleSubmit}>
