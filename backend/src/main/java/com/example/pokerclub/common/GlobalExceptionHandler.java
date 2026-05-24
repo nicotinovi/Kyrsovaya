@@ -11,6 +11,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.security.authentication.BadCredentialsException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -36,13 +37,18 @@ public class GlobalExceptionHandler {
         ex.getBindingResult().getFieldErrors().forEach(error ->
             errors.put(error.getField(), error.getDefaultMessage())
         );
-        return build(HttpStatus.BAD_REQUEST, "Validation failed", request, errors);
+        return build(HttpStatus.BAD_REQUEST, "Проверьте правильность заполнения полей", request, errors);
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     ResponseEntity<ApiError> handleTypeMismatch(MethodArgumentTypeMismatchException ex, HttpServletRequest request) {
         String message = "Некорректное значение параметра: " + ex.getName();
         return build(HttpStatus.BAD_REQUEST, message, request, Map.of());
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    ResponseEntity<ApiError> handleBadCredentials(BadCredentialsException ex, HttpServletRequest request) {
+        return build(HttpStatus.UNAUTHORIZED, "Неверный email или пароль", request, Map.of());
     }
 
     @ExceptionHandler(Exception.class)
